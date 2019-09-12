@@ -38,6 +38,7 @@ def apiRequest(url):
 print("Start: ", time.asctime( time.localtime(time.time()) ))	#Log script start time to console
 
 remainingLimit = 0
+getObjectsUrl = "https://{0}/services/data/v{1}/sobjects/".format(HOST, VERSION)
 getLimitUrl = "https://{0}/services/data/v{1}/limits/".format(HOST, VERSION)
 
 limitsResponse = apiRequest(getLimitUrl)
