@@ -38,17 +38,13 @@ def apiRequest(url):
 print("Start: ", time.asctime( time.localtime(time.time()) ))	#Log script start time to console
 
 remainingLimit = 0
-
-getObjectsUrl = "https://{0}/services/data/v{1}/sobjects/".format(HOST, VERSION)
 getLimitUrl = "https://{0}/services/data/v{1}/limits/".format(HOST, VERSION)
 
-objectsResponse = apiRequest(getObjectsUrl)
 limitsResponse = apiRequest(getLimitUrl)
-requestsMade = 2
+requestsMade = 1
 
 remainingLimit = limitsResponse.json()['DailyApiRequests']['Remaining']
 
-print("Per sObjects request: {0}".format(objectsResponse.headers['Sforce-Limit-Info']))
 print("Per Limits request: {0}".format(limitsResponse.headers['Sforce-Limit-Info']))
 print(remainingLimit)
 
@@ -57,10 +53,14 @@ while remainingLimit > 0:
 	requestsMade += 1
 	print("Requests attempted: {0}".format(requestsMade))
 	objectsResponse = apiRequest(getObjectsUrl)
+	print(objectsResponse.headers['Sforce-Limit-Info'])
+
+	requestsMade += 1
+	print("Requests attempted: {0}".format(requestsMade))
 	limitsResponse = apiRequest(getLimitUrl)
 	remainingLimit = limitsResponse.json()['DailyApiRequests']['Remaining']
 
-	print(objectsResponse.headers['Sforce-Limit-Info'])
+	print(limitsResponse.headers['Sforce-Limit-Info'])
 	print(remainingLimit)
 
 print("End: ", time.asctime( time.localtime(time.time()) ))	# Log script completion ending time to console
