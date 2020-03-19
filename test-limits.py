@@ -2,12 +2,18 @@
 import requests, json, time, sys
 from config import *
 
+#Suppress InsecureRequestWarning message in console when verify certificate option is set to false in API request 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 # Get key values required to access Enterprise API from config file; build complete header to accompany API request
 if SESSION_ID:
 	myHeader = {'Authorization': 'Bearer ' + SESSION_ID,
 				'User-Agent': 'KBH Python Script to test API Limits',
 				'Host': HOST,
-				'Content-Type' : 'application/json'
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'Accept-Charset': 'UTF-8'
 				}
 else:
 	print("Session ID or Auth token not found - cannot proceed")
@@ -15,11 +21,12 @@ else:
 
 ############################################ FUNCTION DEFINITIONS #############################################
 
-# Function that makes Product Catalog API request until successful response obtained, returns that response for processing
-def apiRequest(url):
+# Function that makes GET request
+def apiGetRequest(url, certCheck):
 
 	try:
-		apiResponse = requests.get(url, headers=myHeader, timeout=120)
+		apiResponse = requests.get(url, headers=myHeader, timeout=120, verify=certCheck)
+
 	except:
 		print(apiResponse.status_code)
 		print(apiResponse.content)
@@ -41,7 +48,7 @@ remainingLimit = 0
 getObjectsUrl = "https://{0}/services/data/v{1}/sobjects/".format(HOST, VERSION)
 getLimitUrl = "https://{0}/services/data/v{1}/limits/".format(HOST, VERSION)
 
-limitsResponse = apiRequest(getLimitUrl)
+limitsResponse = apiGetRequest(getLimitUrl, False)
 requestsMade = 1
 
 remainingLimit = limitsResponse.json()['DailyApiRequests']['Remaining']
@@ -53,12 +60,12 @@ while remainingLimit > 0:
 
 	requestsMade += 1
 	print("Requests attempted: {0}".format(requestsMade))
-	objectsResponse = apiRequest(getObjectsUrl)
+	objectsResponse = apiGetRequest(getObjectsUrl, False)
 	print(objectsResponse.headers['Sforce-Limit-Info'])
 
 	requestsMade += 1
 	print("Requests attempted: {0}".format(requestsMade))
-	limitsResponse = apiRequest(getLimitUrl)
+	limitsResponse = apiGetRequest(getLimitUrl, False)
 	remainingLimit = limitsResponse.json()['DailyApiRequests']['Remaining']
 
 	print(limitsResponse.headers['Sforce-Limit-Info'])
