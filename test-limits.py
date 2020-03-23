@@ -68,8 +68,9 @@ while remainingLimit > 0:
 	limitsResponse = apiGetRequest(getLimitUrl, False)
 	remainingLimit = limitsResponse.json()['DailyApiRequests']['Remaining']
 
+	print(time.asctime( time.localtime(time.time()) ))
 	print(limitsResponse.headers['Sforce-Limit-Info'])
-	print(remainingLimit)
+	print("Remaining: ", remainingLimit)
 
 print("End: ", time.asctime( time.localtime(time.time()) ))	# Log script completion ending time to console
 print(objectsResponse.headers['Sforce-Limit-Info'])
